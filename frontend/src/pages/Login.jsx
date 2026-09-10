@@ -14,23 +14,45 @@ const Messagepage = () => {
 
 
   usePageTitle("Contact - Harshyyy");
+    const onSubmit = async (data) => {
+      try {
+        const r = await fetch(`${import.meta.env.VITE_API_URL}/api/users`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
 
-  const onSubmit = async (data) => {
-    try{
-     if (r.ok) {
-  alert("Your message has been sent succesfully");
-  localStorage.setItem('isLoggedIn', 'true');
-  navigate('/');
-} 
-    const formdata = await r.json();
-    if (r.ok) {
-      alert("Your message has been sent succesfully")
+        const formdata = await r.json();
+
+        if (r.ok) {
+          alert("Your message has been sent successfully");
+        } else {
+          console.error(formdata);
+          alert("Failed to send message");
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Error sending Message");
+      }
     };
-  }catch (error) {
-    console.error(error)
-    alert("Error sending Message")
-  }
-  };
+  // const onSubmit = async (data) => {
+  //   try{
+  //   let r = await fetch(`${import.meta.env.VITE_API_URL}/message`, {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(data),
+  //   })
+  //   const formdata = await r.json();
+  //   if (r.ok) {
+  //     alert("Your message has been sent succesfully")
+  //   };
+  // }catch (error) {
+  //   console.error(error)
+  //   alert("Error sending Message")
+  // }
+  // };
 
   return (
     <>
@@ -66,7 +88,7 @@ const Messagepage = () => {
                 })}
               />
               {errors.messages && (
-                <p className="error">{errors.messages.message}</p>
+                <p className="error">{errors.message.message}</p>
               )}
               <button className="cursor-pointer" type="submit">Submit</button>
             </form>
