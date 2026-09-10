@@ -1,0 +1,36 @@
+questionaires
+
+{   name:"PHQ-9",
+    measures:"depression symptomps",
+    questions:9,
+}
+
+{   name:"GAD-7",
+    measures:"Anxiety symptomps",
+    questions:7,
+}
+
+{   name:"PCL-5",
+    measures:"PTSD symptomps",
+    questions:20,
+}
+
+{   name:"WHO-5",
+    measures:"General psychological well-being",
+    questions:5,
+}
+
+{   name:"PHQ-8",
+    measures:"General psychological well-being",
+    questions:5,
+}
+
+{   name:"PHQ-4",
+    measures:"General psychological well-being",
+    questions:5,
+}
+
+{   name:"ISI",
+    measures:"General psychological well-being",
+    questions:5,
+}

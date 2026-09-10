@@ -1,0 +1,111 @@
+.main-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
+}
+
+.main-body {
+  background-color: #000;
+  border-radius: 10px;
+  padding: 60px;
+}
+
+.message-contents {
+  width: 100%;
+  text-align: center;
+}
+
+.message-contents > h1 {
+  font-size: 60px;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.int-form > form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.error {
+  color: red;
+  font-size: small;
+}
+
+.int-form > form > input {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  border: none;
+  padding: 10px 5px;
+  color: #ffffff;
+  margin-top: 8px;
+}
+
+.int-form > form > textarea {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  border: none;
+  padding: 10px 8px;
+  color: #ffffff;
+  margin-top: 8px;
+}
+
+.int-form > form > input::placeholder {
+  color: blueviolet;
+}
+
+.int-form > form > textarea::placeholder {
+  color: blueviolet;
+}
+
+.int-form > form > button {
+  padding: 15px 20px;
+  font-size: 14px;
+  border-radius: 5px;
+  color: blueviolet;
+  border: none;
+  margin-top: 20px;
+}
+
+@media (max-width: 640px) {
+  .main-div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90vh;
+  }
+
+  .main-body {
+    margin: 0px 70px;
+    padding: 50px
+  }
+
+  .message-contents > h1 {
+    font-size: 40px;
+  }
+
+  .int-form > form > input{
+    padding: 8px;
+    width: 100%;
+  }
+
+  .int-form > form > textarea{
+    padding: 8px;
+    width: 100%;
+  }
+
+  .int-form > form > button {
+    margin-top: 20px;
+  }
+
+  .int-form > form > input::placeholder,
+  .int-form > form > textarea::placeholder {
+    font-size: 12px;
+  }
+}
