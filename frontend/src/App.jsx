@@ -6,7 +6,13 @@ import Homepage from './pages/Homepage'
 import Login from './pages/Login'
 import Questionspage from './pages/Questionspage'
 import Analysispage from './pages/Analysispage'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
+
+const ProtectedRoute = ({ children }) => {
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
+
+  return isLoggedIn ? children : <Navigate to="/login" replace />
+}
 
 const App = () => {
   return (

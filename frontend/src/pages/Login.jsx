@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from 'react-router-dom';
 import "./messages.css"; 
 import { useForm } from "react-hook-form";
 import { usePageTitle } from '../UsePageTitle'
@@ -9,16 +10,18 @@ const Messagepage = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const navigate = useNavigate();
+
 
   usePageTitle("Contact - Harshyyy");
 
   const onSubmit = async (data) => {
     try{
-    let r = await fetch(`${import.meta.env.VITE_API_URL}/message`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-    })
+     if (r.ok) {
+  alert("Your message has been sent succesfully");
+  localStorage.setItem('isLoggedIn', 'true');
+  navigate('/');
+} 
     const formdata = await r.json();
     if (r.ok) {
       alert("Your message has been sent succesfully")
