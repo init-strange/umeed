@@ -1,7 +1,9 @@
 import React from 'react'
 import './Homepage.css'
+import { useNavigate } from 'react-router-dom'
 
 const Homepage = ({ onStart }) => {
+  const navigate=useNavigate()
   return (
     <div className="page home-page">
       <div className="blob blob-1"></div>
@@ -21,7 +23,8 @@ const Homepage = ({ onStart }) => {
           </p>
         </div>
 
-        <button className="start-btn" onClick={onStart}>
+        <button onClick={() => navigate('/questions')}>
+
           Check-in Shuru Karein <span className="btn-arrow">→</span>
         </button>
 
