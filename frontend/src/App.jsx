@@ -2,6 +2,7 @@ import React from 'react'
 import Navbar from './components/Navbar'
 import Body from './components/Body'
 import Notfound from './components/Notfound'
+// import Register from './pages/Register'
 import Homepage from './pages/Homepage'
 import Login from './pages/Login'
 import Questionspage from './pages/Questionspage'
@@ -20,6 +21,7 @@ const App = () => {
       <Navbar />
       <Routes>
         <Route path="/" element={<Homepage />} />
+        <Route path="/homepage" element={<Homepage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/questions" element={<Questionspage />} />
         <Route path="/analysis" element={<Analysispage />} />

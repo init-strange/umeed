@@ -16,27 +16,35 @@ const Messagepage = () => {
   usePageTitle("Contact - Harshyyy");
     const onSubmit = async (data) => {
       try {
-        const r = await fetch(`${import.meta.env.VITE_API_URL}/api/users`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        });
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/users/check`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: data.email,
+            }),
+          }
+        );
 
-        const formdata = await r.json();
+        const result = await response.json();
 
-        if (r.ok) {
-          alert("Your message has been sent successfully");
+        if (result.exists) {
+          // User exists → go to homepage
+          navigate("/homepage");
         } else {
-          console.error(formdata);
-          alert("Failed to send message");
+            // navigate("/Register");
+          alert("User does not exist. Please register first.");
         }
+
       } catch (error) {
         console.error(error);
-        alert("Error sending Message");
+        alert("Unable to connect to server");
       }
     };
+
   // const onSubmit = async (data) => {
   //   try{
   //   let r = await fetch(`${import.meta.env.VITE_API_URL}/message`, {
