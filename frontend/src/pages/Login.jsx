@@ -13,7 +13,7 @@ const Messagepage = () => {
   const navigate = useNavigate();
 
 
-  usePageTitle("Contact - Harshyyy");
+  usePageTitle("Emergency contact");
     const onSubmit = async (data) => {
       try {
         const response = await fetch(

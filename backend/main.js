@@ -1,15 +1,22 @@
 import express from "express";
-import "dotenv/config";
 import cors from "cors";
+import "dotenv/config";
+
 import connectdb from "./configs/db.js";
-import geminiRoutes from "./routes/gemini.js"; // 1. Import new Gemini route
+import geminiRoutes from "./routes/gemini.js";
 import userRoutes from "./routes/users.js";
+import questionRoutes from "./routes/questions.js";
 
 const app = express();
 
 await connectdb();
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+}));
+
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -17,8 +24,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/users", userRoutes);
-
-app.use("/api/ai", geminiRoutes); // 2. Register route
+app.use("/api/ai", geminiRoutes);
+app.use("/questions", questionRoutes);
 
 const PORT = process.env.PORT || 3000;
 
@@ -27,4 +34,3 @@ app.listen(PORT, () => {
 });
 
 export default app;
-

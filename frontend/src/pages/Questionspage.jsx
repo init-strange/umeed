@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const categoryOrder = ['PHQ-4', 'WHO-5', 'GAD-7', 'PHQ-9', 'PCL-5'];
 const categoryLabels = {
@@ -18,13 +18,56 @@ const Questionspage = () => {
   const [answers, setAnswers] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
+  // Only fetching belongs inside useEffect
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/questions`)
-      .then((res) => res.json())
-      .then((data) => setAllQuestions(data))
-      .catch((err) => console.error('Failed to load questions:', err));
-  }, []);
+  const apiUrl = "http://localhost:3000"
 
+  console.log("API URL:", apiUrl);
+
+  if (!apiUrl) {
+    console.error("❌ VITE_API_URL is missing!");
+    return;
+  }
+
+  fetch(`${apiUrl}/questions`)
+    .then(async (res) => {
+      console.log("Questions status:", res.status);
+      console.log("Questions content-type:", res.headers.get("content-type"));
+
+      const text = await res.text();
+
+      console.log("Questions raw response:", text);
+
+      if (!res.ok) {
+        throw new Error(
+          `Questions API failed: ${res.status} ${res.statusText}`
+        );
+      }
+
+      try {
+        return JSON.parse(text);
+      } catch (error) {
+        console.error("❌ Response is NOT valid JSON");
+        console.error("Raw response was:", text);
+
+        throw new Error("Backend returned invalid JSON");
+      }
+    })
+    .then((data) => {
+      console.log("✅ Questions from backend:", data);
+
+      if (!Array.isArray(data)) {
+        throw new Error("Backend did not return a questions array");
+      }
+
+      setAllQuestions(data);
+    })
+    .catch((err) => {
+      console.error("❌ Failed to load questions:", err);
+    });
+}, []);
+
+  // Normal functions belong OUTSIDE useEffect
   const getOptions = (setId) => {
     if (setId === 'WHO-5') {
       return [
@@ -36,6 +79,7 @@ const Questionspage = () => {
         { label: 'All of the time', value: 5 },
       ];
     }
+
     if (setId === 'PCL-5') {
       return [
         { label: 'Not at all', value: 0 },
@@ -45,6 +89,7 @@ const Questionspage = () => {
         { label: 'Extremely', value: 4 },
       ];
     }
+
     return [
       { label: 'Not at all', value: 0 },
       { label: 'Several days', value: 1 },
@@ -54,33 +99,77 @@ const Questionspage = () => {
   };
 
   const handleSelect = (questionId, value) => {
-    setAnswers((prev) => ({ ...prev, [questionId]: value }));
+    setAnswers((prev) => ({
+      ...prev,
+      [questionId]: value,
+    }));
   };
 
   const handleBack = () => {
-    if (stepIndex > 0) setStepIndex(stepIndex - 1);
+    if (stepIndex > 0) {
+      setStepIndex(stepIndex - 1);
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    }
   };
 
   const handleNext = async () => {
     if (stepIndex < categoryOrder.length - 1) {
       setStepIndex(stepIndex + 1);
+
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+
       return;
     }
 
-    // Last category — submit everything to the backend
+    const userId = localStorage.getItem('userId');
+
+    if (!userId) {
+      alert('Session expired. Please login again.');
+      navigate('/login');
+      return;
+    }
+
     setSubmitting(true);
+
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/assessment`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          answers,
-          userId: localStorage.getItem('userId'),
-        }),
-      });
+      const assessmentAnswers = allQuestions.map((q) => ({
+        set_id: q.set_id,
+        question_id: q.question_id,
+        question_text: q.question_text,
+        score: answers[q.question_id],
+      }));
+
+      console.log("Sending assessment:", assessmentAnswers);
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/assessment`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId,
+            answers: assessmentAnswers,
+          }),
+        }
+      );
 
       const result = await res.json();
-      navigate('/analysis', { state: { result } });
+
+      if (!res.ok) {
+        throw new Error(result.message || 'Submission failed');
+      }
+
+      navigate('/analysis', {
+        state: { result },
+      });
     } catch (error) {
       console.error(error);
       alert('Kuch gadbad ho gayi, dobara try karein.');
@@ -98,71 +187,100 @@ const Questionspage = () => {
   }
 
   const currentCategory = categoryOrder[stepIndex];
-  const currentQuestions = allQuestions.filter((q) => q.set_id === currentCategory);
+
+  const currentQuestions = allQuestions.filter(
+    (q) => q.set_id === currentCategory
+  );
+
   const allCurrentAnswered = currentQuestions.every(
     (q) => answers[q.question_id] !== undefined
   );
 
   return (
-    <div className="page question-page">
-      <div className="blob blob-1"></div>
-      <div className="blob blob-2"></div>
+<div className="page question-page">
+  {/* Decorative Background Blobs */}
+  <div className="blob blob-1" />
+  <div className="blob blob-2" />
 
-      <div className="question-card">
-        {/* Progress Bar */}
-        <div className="progress-container">
-          <div
-            className="progress-bar"
-            style={{ width: `${((stepIndex + 1) / categoryOrder.length) * 100}%` }}
-          ></div>
-        </div>
-        <span className="step-count">
-          Kadam {stepIndex + 1} of {categoryOrder.length} — {categoryLabels[currentCategory]}
-        </span>
-
-        <div className="step-content">
-          {currentQuestions.map((q) => (
-            <div className="question-block" key={q.question_id}>
-              <h2 className="question-title">{q.question_text}</h2>
-              <div className="chip-group">
-                {getOptions(q.set_id).map((opt) => (
-                  <button
-                    key={opt.value}
-                    className={`chip-btn ${
-                      answers[q.question_id] === opt.value ? 'selected' : ''
-                    }`}
-                    onClick={() => handleSelect(q.question_id, opt.value)}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Action Controls */}
-        <div className="action-row">
-          {stepIndex > 0 && (
-            <button className="back-btn" onClick={handleBack}>
-              ← Peeche
-            </button>
-          )}
-          <button
-            className="next-btn"
-            onClick={handleNext}
-            disabled={!allCurrentAnswered || submitting}
-          >
-            {submitting
-              ? 'Analysis ban rahi hai...'
-              : stepIndex === categoryOrder.length - 1
-              ? 'Analysis Dekhein ✨'
-              : 'Aage Badhein →'}
-          </button>
-        </div>
-      </div>
+  <div className="question-card">
+    {/* Progress Bar */}
+    <div className="progress-container">
+      <div
+        className="progress-bar"
+        style={{
+          width: `${((stepIndex + 1) / categoryOrder.length) * 100}%`,
+        }}
+      />
     </div>
+
+    {/* Step Information */}
+    <span className="step-count">
+      Kadam {stepIndex + 1} of {categoryOrder.length} —{' '}
+      {categoryLabels[currentCategory]}
+    </span>
+
+    {/* Questions */}
+    <div className="step-content">
+      {currentQuestions.map((q) => (
+        <div className="question-block" key={q.question_id}>
+          <h2 className="question-title">
+            {q.question_text}
+          </h2>
+
+          {/* Answer Options */}
+          <div className="chip-group">
+            {getOptions(q.set_id).map((opt) => {
+              const isSelected =
+                answers[q.question_id] === opt.value;
+
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  className={`chip-btn ${
+                    isSelected ? 'selected' : ''
+                  }`}
+                  onClick={() =>
+                    handleSelect(q.question_id, opt.value)
+                  }
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {/* Navigation Actions */}
+    <div className="action-row">
+      {stepIndex > 0 && (
+        <button
+          type="button"
+          className="back-btn"
+          onClick={handleBack}
+        >
+          ← Peeche
+        </button>
+      )}
+
+      <button
+        type="button"
+        className="next-btn"
+        onClick={handleNext}
+        disabled={!allCurrentAnswered || submitting}
+      >
+        {submitting
+          ? 'Analysis ban rahi hai...'
+          : stepIndex === categoryOrder.length - 1
+          ? 'Analysis Dekhein ✨'
+          : 'Aage Badhein →'}
+      </button>
+    </div>
+  </div>
+</div>
   );
 };
 
-export default Questionspage
+export default Questionspage;
