@@ -23,7 +23,7 @@ const Homepage = ({ onStart }) => {
           </p>
         </div>
 
-        <button onClick={() => navigate('/questions')}>
+        <button className="start-btn"  onClick={() => navigate('/questions')}>
 
           Check-in Shuru Karein <span className="btn-arrow">→</span>
         </button>
