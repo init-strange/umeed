@@ -9,6 +9,7 @@
   "keywords": [],
   "type": "module",
   "dependencies": {
+    "@google/genai": "^2.22.0",
     "body-parser": "^2.3.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
